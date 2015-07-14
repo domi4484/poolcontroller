@@ -1,0 +1,21 @@
+/***********************************************************
+            Read analog in put on request
+            
+Description:  Programma per leggere la tensione per il 
+              progetto piscina
+Author:       Damiano Lombardi
+Date:         11.02.2012
+
+Copiright (c) Damiano Lombard
+***********************************************************/
+
+const int inA0 = A0;
+
+void setup() 
+{
+  Serial.begin(9600);
+}
+
+void loop()
+{
+  Serial.read
