@@ -1,6 +1,9 @@
-#include "dialogaddcalibrationpoint.h"
-#include "ui_dialogaddcalibrationpoint.h"
 
+// Files includes --------------------------
+#include "DialogAddCalibrationPoint.h"
+#include "ui_DialogAddCalibrationPoint.h"
+
+// Project includes ------------------------
 #include "AbstractTemperaturesensor.h"
 
 DialogAddCalibrationPoint::DialogAddCalibrationPoint(QWidget *parent, AbstractTemperatureSensor *sensor) :

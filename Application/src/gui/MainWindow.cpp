@@ -80,10 +80,6 @@ MainWindow::MainWindow(bool emulate_hardware,
 
     m_dialogAddCalibrationPoint = new DialogAddCalibrationPoint(this, m_temperatureSensor);
 
-    QDateTime tempo = QDateTime::currentDateTime();
-    ui->lbl_startTime->setText(tempo.time().toString());
-
-
     // Grafico
     QTimer* timerGraph = new QTimer(this);
     connect(timerGraph, SIGNAL(timeout()), this, SLOT(updateGraph()));

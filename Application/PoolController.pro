@@ -18,7 +18,6 @@ OBJECTS_DIR = build
 CONFIG += extserialport
 
 SOURCES +=\
-    src/gui/ComDialog.cpp \
     src/gui/MainWindow.cpp \
     src/hardware/AbstractTemperaturesensor.cpp \
     src/hardware/Arduino.cpp \
@@ -29,7 +28,6 @@ SOURCES +=\
     src/main.cpp
 
 HEADERS  += \
-    src/gui/ComDialog.h \
     src/hardware/CpuTemperature.h \
     src/hardware/DialogAddCalibrationpoint.h \
     src/hardware/TemperatureSensor.h \
@@ -40,6 +38,5 @@ HEADERS  += \
 
 FORMS    += \
     src/hardware/DialogAddCalibrationpoint.ui \
-    src/gui/MainWindow.ui \
-    src/gui/ComDialog.ui
+    src/gui/MainWindow.ui
 

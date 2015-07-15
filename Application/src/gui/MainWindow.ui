@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>702</width>
-    <height>544</height>
+    <width>728</width>
+    <height>225</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -35,37 +35,6 @@
     </item>
     <item>
      <layout class="QVBoxLayout" name="verticalLayout_4">
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_5">
-        <item>
-         <widget class="QLabel" name="lbl_startTime">
-          <property name="text">
-           <string>TextLabel</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QLabel" name="lbl_endTime">
-          <property name="text">
-           <string>Now</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
       <item>
        <widget class="Line" name="line_2">
         <property name="orientation">
@@ -117,7 +86,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>702</width>
+     <width>728</width>
      <height>25</height>
     </rect>
    </property>

@@ -16,9 +16,8 @@
 
 #include <fstream>
 
-#include "ComDialog.h"
 #include "../hardware/AbstractTemperaturesensor.h"
-#include "../hardware/dialogaddcalibrationpoint.h"
+#include "../hardware/DialogAddCalibrationPoint.h"
 
 namespace Ui {
     class MainWindow;
