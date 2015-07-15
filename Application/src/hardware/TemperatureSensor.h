@@ -7,12 +7,18 @@
 #include "AbstractTemperaturesensor.h"
 #include "Arduino.h"
 
+// Qt includes -----------------------------
+#include <QStringList>
+
 class QProcess;
 
 class TemperatureSensor : public AbstractTemperatureSensor
 {
 Q_OBJECT
 public:
+
+   static const int TEMPERATURE_MINIMUM;
+   static const int TEMPERATURE_MAXIMUM;
 
    TemperatureSensor(int delay);
    virtual ~TemperatureSensor();
@@ -26,10 +32,12 @@ public:
 private:
     static const QString SCRIPT_CARATTERISTICA;
 
-    Arduino *m_arduino;
-    QList<double> m_polinomio;
-    QProcess *m_process;
+    Arduino *m_Arduino;
+    QList<double> m_PolinomioCalibrazione;
+    QProcess *m_QProcess;
     bool m_ready;
+
+    QStringList m_QList_Voltages;
 
     virtual double measure();
     double voltageToTemperature(double voltage);

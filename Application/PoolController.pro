@@ -40,3 +40,7 @@ FORMS    += \
     src/hardware/DialogAddCalibrationpoint.ui \
     src/gui/MainWindow.ui
 
+DISTFILES += \
+    scripts/caratteristica.py \
+    ../Arduino/programma_arduino.pde
+

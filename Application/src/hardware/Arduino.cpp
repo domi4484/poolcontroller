@@ -9,7 +9,8 @@
 
 //-----------------------------------------------------------------------------------------------------------------------------
 
-Arduino::Arduino()
+Arduino::Arduino() :
+  m_A1_Voltage(-1.0)
 {
 }
 
@@ -17,8 +18,7 @@ Arduino::Arduino()
 
 Arduino::~Arduino()
 {
-    m_port->close();
-    qDebug("is open: %d", m_port->isOpen());
+    m_QExtSerialPort->close();
 }
 
 //-----------------------------------------------------------------------------------------------------------------------------
@@ -26,31 +26,49 @@ Arduino::~Arduino()
 bool Arduino::open(const QString &port_name)
 {
   Logger::info(QString("Initializing Arduino device on port: %1").arg(port_name));
-  m_port = new QextSerialPort(port_name);
-  m_port->setBaudRate(BAUD9600);
-  m_port->open(QIODevice::ReadWrite | QIODevice::Unbuffered);
+  m_QExtSerialPort = new QextSerialPort(port_name);
+  m_QExtSerialPort->setBaudRate(BAUD9600);
+  m_QExtSerialPort->open(QIODevice::ReadWrite | QIODevice::Unbuffered);
 
-  return m_port->isOpen();
+  return m_QExtSerialPort->isOpen();
 }
 
 //-----------------------------------------------------------------------------------------------------------------------------
 
-double Arduino::readVoltage()
+bool Arduino::readVoltage()
 {
-    send("1\n");
+    if(send("1\n") == false)
+    {
+      return false;
+    }
+
     QString answer = receive();
-    return 5.0*answer.toLongLong()/1024;
+    m_A1_Voltage = 5.0*answer.toLongLong()/1024.0;
+
+    return true;
 }
 
 //-----------------------------------------------------------------------------------------------------------------------------
 
-void Arduino::send(const QString &message)
+double Arduino::get_A1_Voltage()
 {
-    int i = m_port->write(message.toAscii(),
+  return m_A1_Voltage;
+}
+
+//-----------------------------------------------------------------------------------------------------------------------------
+
+bool Arduino::send(const QString &message)
+{
+    int i = m_QExtSerialPort->write(message.toAscii(),
                           message.length());
 
     if(i == -1)
+    {
       Logger::error("Arduino::send write error");
+      return false;
+    }
+
+    return true;
 }
 
 //-----------------------------------------------------------------------------------------------------------------------------
@@ -60,18 +78,16 @@ QString Arduino::receive()
     char buff[1024];
     int numBytes;
 
-    numBytes = m_port->bytesAvailable();
+    numBytes = m_QExtSerialPort->bytesAvailable();
     if(numBytes > 1024)
         numBytes = 1024;
 
-    int i = m_port->read(buff, numBytes);
+    int i = m_QExtSerialPort->read(buff, numBytes);
     if (i != -1)
         buff[i] = '\0';
     else
         buff[0] = '\0';
 
-    qDebug("bytes available: %d", numBytes);
-    qDebug("received: %d", i);
     return QLatin1String(buff);
 }
 

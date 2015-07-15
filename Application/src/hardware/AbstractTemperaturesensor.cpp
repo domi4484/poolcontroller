@@ -36,9 +36,6 @@ double AbstractTemperatureSensor::getLast()
 void AbstractTemperatureSensor::slot_measure()
 {
     m_temperature = measure();
-    Logger::info(QString::number(m_temperature));
-
-    // TODO write temperature
 
     m_vettore.append(QPointF(m_counter++, m_temperature));
 }

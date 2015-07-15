@@ -13,12 +13,17 @@ public:
 
     bool open(const QString &port_name);
 
-    double readVoltage();
+    bool readVoltage();
+
+    double get_A1_Voltage();
 
 private:
-    QextSerialPort *m_port;
 
-    void send(const QString &message);
+    QextSerialPort *m_QExtSerialPort;
+
+    double m_A1_Voltage;
+
+    bool send(const QString &message);
     QString receive();
 };
 
