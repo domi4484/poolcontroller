@@ -9,7 +9,7 @@ class AbstractTemperatureSensor : public QObject
 {
     Q_OBJECT
 public:
-    AbstractTemperatureSensor(int delay);
+    AbstractTemperatureSensor(double delay_s);
     QVector<QPointF> getData();
     double getLast();
 //    virtual void addCalibrationPoint(double measured_temp){;}

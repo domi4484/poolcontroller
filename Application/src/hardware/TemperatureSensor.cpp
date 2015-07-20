@@ -10,6 +10,8 @@
 #include "TemperatureSensor.h"
 #include "Arduino.h"
 
+#include <QDebug>
+
 //-----------------------------------------------------------------------------------------------------------------------------
 
 const int TemperatureSensor::TEMPERATURE_MINIMUM (-30);
@@ -17,18 +19,24 @@ const int TemperatureSensor::TEMPERATURE_MAXIMUM (100);
 
 //-----------------------------------------------------------------------------------------------------------------------------
 
-TemperatureSensor::TemperatureSensor(int delay) :
-    AbstractTemperatureSensor(delay),
+TemperatureSensor::TemperatureSensor(double delay_s) :
+    AbstractTemperatureSensor(delay_s),
     m_Arduino(new Arduino()),
     m_PolinomioCalibrazione(),
-    m_QProcess(new QProcess),
+    m_QProcess_CalculatePolinome(new QProcess),
+    m_QProcess_CreateVoltageGraphic(new QProcess),
     m_ready(false),
     m_QList_Voltages()
 {
-    connect(m_QProcess,
+    connect(m_QProcess_CalculatePolinome,
             SIGNAL(finished(int)),
             this,
             SLOT(slot_retrievePolinomioFinished(int)));
+    connect(m_QProcess_CreateVoltageGraphic,
+            SIGNAL(finished(int)),
+            this,
+            SLOT(slot_QProcess_CreateVoltageGraphic_finished(int)));
+
 
     retrievePolinomio();
 }
@@ -57,7 +65,7 @@ bool TemperatureSensor::open(const QString &port)
 
 double TemperatureSensor::voltageToTemperature(double voltage)
 {
-    return m_PolinomioCalibrazione[0] + m_PolinomioCalibrazione[1]*voltage + m_PolinomioCalibrazione[2]*voltage*voltage;
+    return m_PolinomioCalibrazione[2] + m_PolinomioCalibrazione[1]*voltage + m_PolinomioCalibrazione[0]*voltage*voltage;
 }
 
 //-----------------------------------------------------------------------------------------------------------------------------
@@ -74,11 +82,20 @@ double TemperatureSensor::measure()
     }
 
     double voltage     = m_Arduino->get_A1_Voltage();
-    double temperature = voltageToTemperature(voltage);
+    double filtered = voltage;
+    if(m_QList_Voltages.isEmpty() == false)
+    {
+      double e = 0.3;
+      filtered = (1-e) * m_QList_Voltages.first().toDouble() + e * voltage;
+    }
+
+    qDebug() << voltage << filtered;
+
+    double temperature = voltageToTemperature(filtered);
 
 
-    m_QList_Voltages.insert(0, QString::number(voltage));
-    while(m_QList_Voltages.size() > 20)
+    m_QList_Voltages.insert(0, QString::number(filtered));
+    while(m_QList_Voltages.size() > 30)
     {
       m_QList_Voltages.removeLast();
     }
@@ -91,6 +108,8 @@ double TemperatureSensor::measure()
     else
     {
       qFile.write(m_QList_Voltages.join("\n").toLatin1());
+
+      m_QProcess_CreateVoltageGraphic->start("./scripts/onlineVoltage.py");
     }
 
     if(   temperature < TEMPERATURE_MINIMUM
@@ -117,7 +136,7 @@ void TemperatureSensor::retrievePolinomio()
     if(QFile::exists(script) == false)
       Logger::error(tr("Script '%1' not found"));
 
-    m_QProcess->start("./scripts/caratteristica.py");
+    m_QProcess_CalculatePolinome->start("./scripts/caratteristica.py");
 }
 
 //-----------------------------------------------------------------------------------------------------------------------------
@@ -125,10 +144,17 @@ void TemperatureSensor::retrievePolinomio()
 void TemperatureSensor::slot_retrievePolinomioFinished(int status)
 {
     Logger::info(QString("Process status: %1").arg(status));
-    QString ret(m_QProcess->readAllStandardOutput());
+    QString ret(m_QProcess_CalculatePolinome->readAllStandardOutput());
     Logger::info(QString("Polinomio: %1").arg(ret));
     QStringList rets = ret.split(" ");
     foreach(QString string, rets)
         m_PolinomioCalibrazione.append(string.toDouble());
     m_ready = true;
+}
+
+//-----------------------------------------------------------------------------------------------------------------------------
+
+void TemperatureSensor::slot_QProcess_CreateVoltageGraphic_finished(int status)
+{
+
 }

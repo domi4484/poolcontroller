@@ -40,10 +40,9 @@ private:
 
     static const QString PORT_1;
     static const QString PORT_2;
-    static const int     DELAY_S;
+    static const double  DELAY_S;
 
 public slots:
-    void on_btn_browse_clicked();
     void on_actionAggiungi_punto_di_calibrazione_triggered();
 
     void updateGraph();

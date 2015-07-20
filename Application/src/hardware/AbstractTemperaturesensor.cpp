@@ -7,14 +7,14 @@
 
 //-----------------------------------------------------------------------------------------------------------------------------
 
-AbstractTemperatureSensor::AbstractTemperatureSensor(int delay) :
+AbstractTemperatureSensor::AbstractTemperatureSensor(double delay_s) :
     QObject(),
     m_temperature(0),
     m_counter    (0)
 {
     QTimer* timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(slot_measure()));
-    timer->start(delay*1000);  // in ms
+    timer->start(delay_s*1000);  // in ms
 }
 
 //-----------------------------------------------------------------------------------------------------------------------------

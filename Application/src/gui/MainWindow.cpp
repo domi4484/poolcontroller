@@ -16,7 +16,7 @@ using namespace std;
 
 //-----------------------------------------------------------------------------------------------------------------------------
 
-const int INTERVALLO_UPDATE_GRAFICO = 5; // Ogni quanti secondi faccio un refresh del grafico
+const int INTERVALLO_UPDATE_GRAFICO = 1; // Ogni quanti secondi faccio un refresh del grafico
 const int INTERVALLO_LOG = 60; // Updates del log file in secondi
 const int MAX = 70;
 const int MIN = -10;
@@ -25,7 +25,7 @@ const int MIN = -10;
 
 const QString MainWindow::PORT_1 ("/dev/ttyACM0");
 const QString MainWindow::PORT_2 ("/dev/");
-const int     MainWindow::DELAY_S(1);
+const double  MainWindow::DELAY_S(1.0);
 
 //-----------------------------------------------------------------------------------------------------------------------------
 
@@ -90,29 +90,7 @@ MainWindow::MainWindow(bool emulate_hardware,
 
 MainWindow::~MainWindow()
 {
-    delete ui;
-}
-
-//-----------------------------------------------------------------------------------------------------------------------------
-
-/*  Browse for a logfile */
-void MainWindow::on_btn_browse_clicked()
-{
-    QFileDialog fileDialog(this);
-    fileDialog.setDirectory("/home/domi/Progetti/cascinaKeko");
-    fileDialog.setFileMode(QFileDialog::AnyFile);
-    fileDialog.setNameFilter(tr("*.dat"));
-    QStringList fileNames;
-    if (fileDialog.exec())
-    {
-        fileNames =fileDialog.selectedFiles();
-        QString fileName = fileNames[0];
-        ui->edit_log->setText(fileName);
-        m_log = new ofstream(fileName.toStdString().c_str(), ios::app);
-    }
-    else
-        m_log = NULL;
-
+  delete ui;
 }
 
 //-----------------------------------------------------------------------------------------------------------------------------
@@ -129,6 +107,7 @@ void MainWindow::on_actionAggiungi_punto_di_calibrazione_triggered()
 void MainWindow::updateGraph()
 {
     ui->lcdNumber->display(m_temperatureSensor->getLast());
+    ui->m_QLabel_Graphic->setPixmap(QPixmap("voltage.png"));
 }
 
 //-----------------------------------------------------------------------------------------------------------------------------

@@ -20,7 +20,7 @@ public:
    static const int TEMPERATURE_MINIMUM;
    static const int TEMPERATURE_MAXIMUM;
 
-   TemperatureSensor(int delay);
+   TemperatureSensor(double delay_s);
    virtual ~TemperatureSensor();
 
    bool open(const QString &port);
@@ -34,7 +34,8 @@ private:
 
     Arduino *m_Arduino;
     QList<double> m_PolinomioCalibrazione;
-    QProcess *m_QProcess;
+    QProcess *m_QProcess_CalculatePolinome;
+    QProcess *m_QProcess_CreateVoltageGraphic;
     bool m_ready;
 
     QStringList m_QList_Voltages;
@@ -44,7 +45,9 @@ private:
     void retrievePolinomio();
 
 private slots:
+
     void slot_retrievePolinomioFinished(int status);
+    void slot_QProcess_CreateVoltageGraphic_finished(int status);
 };
 
 #endif // TEMPERATURESENSOR_H

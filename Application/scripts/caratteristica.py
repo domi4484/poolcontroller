@@ -9,21 +9,11 @@
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-import sqlite3
 import numpy as np
-
-BANCA = 'banca_dati.sqlite3'
+import matplotlib.pyplot as plt
 
 #% Carico i dati misurati (referenza)
-connessione = sqlite3.connect(BANCA)
-cursore = connessione.cursor()
-voltage = np.array([])
-temperature = np.array([])
-cursore.execute('SELECT voltage, temperature FROM calibration_data')
-for row in cursore:
-  voltage = np.r_[voltage, row[0]]
-  temperature = np.r_[temperature, row[1]]
-
+voltage, temperature = np.loadtxt('CalibrationData.dat', delimiter=';', usecols=(0, 1), unpack=True)
 
 #% Calcolo della regressione lineare per un polinomio di 2 grado
 a, b, c = np.polyfit(voltage, temperature, 2);
@@ -31,15 +21,11 @@ p = [str(a), str(b), str(c)]
 print(' '.join(p))
 
 #% Preparo la curva calcolata per essere plottata
-#a = p(1)
-#b = p(2)
-#c = p(3)
-#x = linspace(2, 2.5, 20);
-#y = c + b.*x + a.*x.*x;
+calculated_voltages = np.arange(2.0, 2.5, 0.05);
+calculated_temperatures = c + calculated_voltages*b + calculated_voltages*calculated_voltages*a;
 
 #% Plot delle due curve
-#figure(2)
-#plot(x, y, T, U, 'o')
-#grid on
+plt.plot(voltage, temperature, 'o', calculated_voltages, calculated_temperatures, 'b')
+plt.savefig('caratteristica.png')
 
 quit(0)
