@@ -12,14 +12,13 @@
 #include "../hardware/TemperatureSensor.h"
 #include "../hardware/CpuTemperature.h"
 
-using namespace std;
-
 //-----------------------------------------------------------------------------------------------------------------------------
 
 const int INTERVALLO_UPDATE_GRAFICO = 1; // Ogni quanti secondi faccio un refresh del grafico
 const int INTERVALLO_LOG = 60; // Updates del log file in secondi
 const int MAX = 70;
 const int MIN = -10;
+
 
 //-----------------------------------------------------------------------------------------------------------------------------
 
@@ -84,6 +83,8 @@ MainWindow::MainWindow(bool emulate_hardware,
     QTimer* timerGraph = new QTimer(this);
     connect(timerGraph, SIGNAL(timeout()), this, SLOT(updateGraph()));
     timerGraph->start(INTERVALLO_UPDATE_GRAFICO * 1000);  // update del grafico ogni 10 secondi
+
+    setupCalibrationTab();
 }
 
 //-----------------------------------------------------------------------------------------------------------------------------
@@ -107,7 +108,14 @@ void MainWindow::on_actionAggiungi_punto_di_calibrazione_triggered()
 void MainWindow::updateGraph()
 {
     ui->lcdNumber->display(m_temperatureSensor->getLast());
-    ui->m_QLabel_Graphic->setPixmap(QPixmap("voltage.png"));
+    ui->m_QLabel_GraphicLive->setPixmap(QPixmap("voltage.png"));
+}
+
+//-----------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::setupCalibrationTab()
+{
+
 }
 
 //-----------------------------------------------------------------------------------------------------------------------------

@@ -9,11 +9,13 @@
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+import sys
+
 import numpy as np
 import matplotlib.pyplot as plt
 
 #% Carico i dati misurati (referenza)
-voltage, temperature = np.loadtxt('CalibrationData.dat', delimiter=';', usecols=(0, 1), unpack=True)
+voltage, temperature = np.loadtxt(sys.argv[1], delimiter=';', usecols=(0, 1), unpack=True)
 
 #% Calcolo della regressione lineare per un polinomio di 2 grado
 a, b, c = np.polyfit(voltage, temperature, 2);
