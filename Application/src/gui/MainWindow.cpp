@@ -1,8 +1,3 @@
-#include <QFileDialog>
-#include <QFile>
-#include <QDateTime>
-#include <QColorGroup>
-#include <QPalette>
 
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
@@ -10,7 +5,11 @@
 #include "../HelperClasses/Logger.h"
 
 #include "../hardware/TemperatureSensor.h"
-#include "../hardware/CpuTemperature.h"
+
+#include <QFileDialog>
+#include <QFile>
+#include <QDateTime>
+#include <QMessageBox>
 
 //-----------------------------------------------------------------------------------------------------------------------------
 
@@ -32,7 +31,6 @@ MainWindow::MainWindow(bool emulate_hardware,
                        QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    m_dialogAddCalibrationPoint(NULL),
     m_log(NULL),
     m_temperatureSensor(NULL)
 {
@@ -52,32 +50,23 @@ MainWindow::MainWindow(bool emulate_hardware,
     //-----------------------------------------------------------------------------------------------------------------------------
     // Initialize hardware
     //-----------------------------------------------------------------------------------------------------------------------------
-    if (emulate_hardware == false)
-    {
-      TemperatureSensor *temperatureSensor = new TemperatureSensor(DELAY_S);
+    m_temperatureSensor = new TemperatureSensor(DELAY_S);
 
-      Logger::info(QString("Try to open Temperature sensor on port '%1'").arg(PORT_1));
-      if(temperatureSensor->open(PORT_1) == false)
+    Logger::info(QString("Try to open Temperature sensor on port '%1'").arg(PORT_1));
+    if(m_temperatureSensor->open(PORT_1) == false)
+    {
+      Logger::info(QString("No sensor found on port '%1'").arg(PORT_1));
+
+      Logger::info(QString("Try to open Temperature sensor on port '%1'").arg(PORT_2));
+      if(m_temperatureSensor->open(PORT_2) == false)
       {
-         Logger::info(QString("No sensor found on port '%1'").arg(PORT_1));
-
-         Logger::info(QString("Try to open Temperature sensor on port '%1'").arg(PORT_2));
-         if(temperatureSensor->open(PORT_2) == false)
-         {
-           Logger::info("Can't open any sensor");
-         }
+        QMessageBox::critical(this,
+                              tr("Error"),
+                              tr("Can't find temperature sensor"));
+        QApplication::exit(1);
+        return;
       }
-
-      m_temperatureSensor = temperatureSensor;
     }
-    else
-    {
-       Logger::info("Start reading temperature from cpu");
-       m_temperatureSensor = new CpuTemperature(DELAY_S);
-       ui->actionAggiungi_punto_di_calibrazione->setDisabled(true);
-    }
-
-    m_dialogAddCalibrationPoint = new DialogAddCalibrationPoint(this, m_temperatureSensor);
 
     // Grafico
     QTimer* timerGraph = new QTimer(this);
@@ -99,7 +88,6 @@ MainWindow::~MainWindow()
 /* Open the dialog to add a new calibration point */
 void MainWindow::on_actionAggiungi_punto_di_calibrazione_triggered()
 {
-    m_dialogAddCalibrationPoint->show();
 }
 
 //-----------------------------------------------------------------------------------------------------------------------------
@@ -115,7 +103,16 @@ void MainWindow::updateGraph()
 
 void MainWindow::setupCalibrationTab()
 {
+  ui->m_QTreeWidget_CalibrationPoints->clear();
 
+  QList<QPointF> calibrationPoints = m_temperatureSensor->getCalibrationPoints();
+
+  foreach (QPointF point, calibrationPoints)
+  {
+    QTreeWidgetItem *qTreeWidgetItem = new QTreeWidgetItem(ui->m_QTreeWidget_CalibrationPoints);
+    qTreeWidgetItem->setText(0, QString::number(point.x()));
+    qTreeWidgetItem->setText(1, QString::number(point.y()));
+  }
 }
 
 //-----------------------------------------------------------------------------------------------------------------------------

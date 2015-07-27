@@ -25,7 +25,7 @@ const QString TemperatureSensor::PATH_SCRIPT_CARATTERISTICA("./scripts/caratteri
 TemperatureSensor::TemperatureSensor(double delay_s) :
     AbstractTemperatureSensor(delay_s),
     m_Arduino(new Arduino()),
-    m_QMap_CalibrationPoints(),
+    m_QList_CalibrationPoints(),
     m_PolinomioCalibrazione(),
     m_QProcess_CalculatePolinome(new QProcess),
     m_QProcess_CreateVoltageGraphic(new QProcess),
@@ -62,9 +62,19 @@ bool TemperatureSensor::open(const QString &port)
 
 //-----------------------------------------------------------------------------------------------------------------------------
 
-//void TemperatureSensor::addCalibrationPoint(double measured_temp)
-//{
-//}
+void TemperatureSensor::addCalibrationPoint(QPointF newPoint)
+{
+  m_QList_CalibrationPoints.append(newPoint);
+  saveCalibrationPoints();
+  retrievePolinomio();
+}
+
+//-----------------------------------------------------------------------------------------------------------------------------
+
+QList<QPointF> TemperatureSensor::getCalibrationPoints()
+{
+  return m_QList_CalibrationPoints;
+}
 
 //-----------------------------------------------------------------------------------------------------------------------------
 
@@ -77,7 +87,7 @@ double TemperatureSensor::voltageToTemperature(double voltage)
 
 void TemperatureSensor::loadCalibrationPoints()
 {
-  m_QMap_CalibrationPoints.clear();
+  m_QList_CalibrationPoints.clear();
 
   QFile file(PATH_CALIBRATION_POINTS);
   if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
@@ -90,8 +100,34 @@ void TemperatureSensor::loadCalibrationPoints()
   while (!in.atEnd())
   {
       QStringList point = in.readLine().split(";");
-      m_QMap_CalibrationPoints.insert(point.first().toDouble(), point.last().toDouble());
+      m_QList_CalibrationPoints.append(QPointF(point.first().toDouble(),
+                                               point.last().toDouble()));
   }
+
+  file.close();
+}
+
+//-----------------------------------------------------------------------------------------------------------------------------
+
+void TemperatureSensor::saveCalibrationPoints()
+{
+  QFile file(PATH_CALIBRATION_POINTS);
+  if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+  {
+    Logger::error(tr("Can't find '%1'").arg(PATH_CALIBRATION_POINTS));
+      return;
+  }
+
+  QStringList fileContent;
+  foreach (QPointF point, m_QList_CalibrationPoints)
+  {
+    fileContent.append(QString("%1;%2").arg(point.x())
+                                       .arg(point.y()));
+  }
+
+  file.write(fileContent.join("\n").toLatin1());
+
+  file.close();
 }
 
 //-----------------------------------------------------------------------------------------------------------------------------
@@ -165,9 +201,7 @@ void TemperatureSensor::retrievePolinomio()
 
 void TemperatureSensor::slot_retrievePolinomioFinished(int status)
 {
-    Logger::info(QString("Process status: %1").arg(status));
     QString ret(m_QProcess_CalculatePolinome->readAllStandardOutput());
-    Logger::info(QString("Polinomio: %1").arg(ret));
     QStringList rets = ret.split(" ");
     foreach(QString string, rets)
         m_PolinomioCalibrazione.append(string.toDouble());

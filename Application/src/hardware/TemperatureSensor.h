@@ -26,9 +26,15 @@ public:
 
    bool open(const QString &port);
 
-    void addCalibrationPoint(double measured_temp);
+   void addCalibrationPoint(QPointF newPoint);
+   QList<QPointF> getCalibrationPoints();
 
-    virtual QString sensorName() {return "Arduino";}
+   virtual QString sensorName() {return "Arduino";}
+
+private slots:
+
+    void slot_retrievePolinomioFinished(int status);
+    void slot_QProcess_CreateVoltageGraphic_finished(int status);
 
 private:
 
@@ -36,7 +42,7 @@ private:
     static const QString PATH_SCRIPT_CARATTERISTICA;
 
     Arduino *m_Arduino;
-    QMap<double, double> m_QMap_CalibrationPoints;
+    QList<QPointF> m_QList_CalibrationPoints;
     QList<double> m_PolinomioCalibrazione;
     QProcess *m_QProcess_CalculatePolinome;
     QProcess *m_QProcess_CreateVoltageGraphic;
@@ -48,12 +54,8 @@ private:
     virtual double measure();
     double voltageToTemperature(double voltage);
     void loadCalibrationPoints();
+    void saveCalibrationPoints();
     void retrievePolinomio();
-
-private slots:
-
-    void slot_retrievePolinomioFinished(int status);
-    void slot_QProcess_CreateVoltageGraphic_finished(int status);
 };
 
 #endif // TEMPERATURESENSOR_H

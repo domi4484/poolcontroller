@@ -14,14 +14,8 @@
 #include <QMainWindow>
 #include <QTimer>
 
-#include <fstream>
-
-#include "../hardware/AbstractTemperaturesensor.h"
-#include "../hardware/DialogAddCalibrationPoint.h"
-
-namespace Ui {
-    class MainWindow;
-}
+namespace Ui { class MainWindow; }
+class TemperatureSensor;
 
 class MainWindow : public QMainWindow
 {
@@ -49,9 +43,8 @@ private:
     static const double  DELAY_S;
 
     Ui::MainWindow *ui;
-    DialogAddCalibrationPoint *m_dialogAddCalibrationPoint;
     std::ofstream* m_log;
-    AbstractTemperatureSensor* m_temperatureSensor;
+    TemperatureSensor* m_temperatureSensor;
 };
 
 #endif // MAINWINDOW_H
