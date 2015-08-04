@@ -23,50 +23,54 @@ const int MIN = -10;
 
 const QString MainWindow::PORT_1 ("/dev/ttyACM0");
 const QString MainWindow::PORT_2 ("/dev/");
-const double  MainWindow::DELAY_S(1.0);
 
 //-----------------------------------------------------------------------------------------------------------------------------
 
 MainWindow::MainWindow(bool emulate_hardware,
                        QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow),
+    m_Ui(new Ui::MainWindow),
     m_log(NULL),
-    m_temperatureSensor(NULL)
+    m_TemperatureSensor(NULL)
 {
    Logger::instanziate(Logger::LOG_VERBOSE);
    Logger::info("Started application");
 
-   ui->setupUi(this);
+   m_Ui->setupUi(this);
 
 
-    QPalette palette = ui->lcdNumber->palette();
+    QPalette palette = m_Ui->lcdNumber->palette();
     palette.setColor(QPalette::Normal, QPalette::Foreground, Qt::red);
     palette.setColor(QPalette::Normal, QPalette::Light, Qt::black);
     palette.setColor(QPalette::Normal, QPalette::Dark, Qt::darkYellow);
-    ui->lcdNumber->setPalette(palette);
+    m_Ui->lcdNumber->setPalette(palette);
 
 
     //-----------------------------------------------------------------------------------------------------------------------------
     // Initialize hardware
     //-----------------------------------------------------------------------------------------------------------------------------
-    m_temperatureSensor = new TemperatureSensor(DELAY_S);
+    m_TemperatureSensor = new TemperatureSensor();
 
     Logger::info(QString("Try to open Temperature sensor on port '%1'").arg(PORT_1));
-    if(m_temperatureSensor->open(PORT_1) == false)
+    if(m_TemperatureSensor->open(PORT_1) == false)
     {
       Logger::info(QString("No sensor found on port '%1'").arg(PORT_1));
 
       Logger::info(QString("Try to open Temperature sensor on port '%1'").arg(PORT_2));
-      if(m_temperatureSensor->open(PORT_2) == false)
+      if(m_TemperatureSensor->open(PORT_2) == false)
       {
         QMessageBox::critical(this,
                               tr("Error"),
-                              tr("Can't find temperature sensor"));
-        QApplication::exit(1);
-        return;
+                              tr("Can't open temperature sensor"));
       }
     }
+
+    // Connections
+    connect(m_TemperatureSensor,
+            SIGNAL(signal_StatusChanged()),
+            SLOT(slot_TemperatureSensor_StatusChanged()));
+    slot_TemperatureSensor_StatusChanged();
+
 
     // Grafico
     QTimer* timerGraph = new QTimer(this);
@@ -80,36 +84,59 @@ MainWindow::MainWindow(bool emulate_hardware,
 
 MainWindow::~MainWindow()
 {
-  delete ui;
+  delete m_Ui;
 }
 
 //-----------------------------------------------------------------------------------------------------------------------------
 
-/* Open the dialog to add a new calibration point */
-void MainWindow::on_actionAggiungi_punto_di_calibrazione_triggered()
+void MainWindow::slot_TemperatureSensor_StatusChanged()
 {
+  switch (m_TemperatureSensor->status())
+  {
+    case TemperatureSensor::Enum_Status_Offline:
+    {
+      m_Ui->m_QStatusBar->showMessage(tr("Offline"));
+    }
+    break;
+
+    case TemperatureSensor::Enum_Status_Init:
+    {
+      m_Ui->m_QStatusBar->showMessage(tr("Init"));
+    }
+    break;
+
+    case TemperatureSensor::Enum_Status_Running:
+    {
+      m_Ui->m_QStatusBar->showMessage(tr("Running"));
+    }
+    break;
+    case TemperatureSensor::Enum_Status_Stop:
+    {
+      m_Ui->m_QStatusBar->showMessage(tr("Stop"));
+    }
+    break;
+    }
 }
 
 //-----------------------------------------------------------------------------------------------------------------------------
 
-/* Update the Chart */
 void MainWindow::updateGraph()
 {
-    ui->lcdNumber->display(m_temperatureSensor->getLast());
-    ui->m_QLabel_GraphicLive->setPixmap(QPixmap("voltage.png"));
+    m_Ui->lcdNumber->display(m_TemperatureSensor->temperature());
+    m_Ui->m_QLabel_GraphicLive->setPixmap(QPixmap("voltage.png"));
 }
 
 //-----------------------------------------------------------------------------------------------------------------------------
 
 void MainWindow::setupCalibrationTab()
 {
-  ui->m_QTreeWidget_CalibrationPoints->clear();
+  m_Ui->m_QTreeWidget_CalibrationPoints->clear();
 
-  QList<QPointF> calibrationPoints = m_temperatureSensor->getCalibrationPoints();
+  QList<QPointF> calibrationPoints = m_TemperatureSensor->getCalibrationPoints();
 
   foreach (QPointF point, calibrationPoints)
   {
-    QTreeWidgetItem *qTreeWidgetItem = new QTreeWidgetItem(ui->m_QTreeWidget_CalibrationPoints);
+    QTreeWidgetItem *qTreeWidgetItem = new QTreeWidgetItem(m_Ui->m_QTreeWidget_CalibrationPoints);
     qTreeWidgetItem->setText(0, QString::number(point.x()));
     qTreeWidgetItem->setText(1, QString::number(point.y()));
   }

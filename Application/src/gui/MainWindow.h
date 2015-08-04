@@ -26,25 +26,24 @@ public:
     ~MainWindow();
     double getVoltage();
 
-public slots:
-    void on_actionAggiungi_punto_di_calibrazione_triggered();
-
-    void updateGraph();
-
-    void setupCalibrationTab();
-
 signals:
     void newTemp(double newValue);
+
+private slots:
+
+    void slot_TemperatureSensor_StatusChanged();
+
+    void updateGraph();
+    void setupCalibrationTab();
 
 private:
 
     static const QString PORT_1;
     static const QString PORT_2;
-    static const double  DELAY_S;
 
-    Ui::MainWindow *ui;
+    Ui::MainWindow *m_Ui;
     std::ofstream* m_log;
-    TemperatureSensor* m_temperatureSensor;
+    TemperatureSensor* m_TemperatureSensor;
 };
 
 #endif // MAINWINDOW_H

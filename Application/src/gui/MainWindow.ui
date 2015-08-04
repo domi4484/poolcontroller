@@ -130,7 +130,7 @@
    </widget>
    <addaction name="menuAzioni"/>
   </widget>
-  <widget class="QStatusBar" name="statusBar"/>
+  <widget class="QStatusBar" name="m_QStatusBar"/>
   <action name="actionAggiungi_punto_di_calibrazione">
    <property name="text">
     <string>&amp;Aggiungi punto di calibrazione</string>
