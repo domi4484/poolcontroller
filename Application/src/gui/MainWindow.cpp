@@ -1,11 +1,14 @@
 
+
+// File includes ---------------------------
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
 
+// Project includes ------------------------
 #include "../HelperClasses/Logger.h"
-
 #include "../hardware/TemperatureSensor.h"
 
+// Qt includes -----------------------------
 #include <QFileDialog>
 #include <QFile>
 #include <QDateTime>
@@ -13,7 +16,7 @@
 
 //-----------------------------------------------------------------------------------------------------------------------------
 
-const int INTERVALLO_UPDATE_GRAFICO = 1; // Ogni quanti secondi faccio un refresh del grafico
+const int INTERVALLO_UPDATE_GRAFICO_S = 1; // Ogni quanti secondi faccio un refresh del grafico
 const int INTERVALLO_LOG = 60; // Updates del log file in secondi
 const int MAX = 70;
 const int MIN = -10;
@@ -30,8 +33,8 @@ MainWindow::MainWindow(bool emulate_hardware,
                        QWidget *parent) :
     QMainWindow(parent),
     m_Ui(new Ui::MainWindow),
-    m_log(NULL),
-    m_TemperatureSensor(NULL)
+    m_TemperatureSensor(NULL),
+    m_QTimer_UpdateGraphics(this)
 {
    Logger::instanziate(Logger::LOG_VERBOSE);
    Logger::info("Started application");
@@ -65,17 +68,17 @@ MainWindow::MainWindow(bool emulate_hardware,
       }
     }
 
+
     // Connections
+    connect(&m_QTimer_UpdateGraphics,
+            SIGNAL(timeout()),
+            SLOT(updateGraph()));
+    m_QTimer_UpdateGraphics.start(INTERVALLO_UPDATE_GRAFICO_S * 1000);
+
     connect(m_TemperatureSensor,
             SIGNAL(signal_StatusChanged()),
             SLOT(slot_TemperatureSensor_StatusChanged()));
     slot_TemperatureSensor_StatusChanged();
-
-
-    // Grafico
-    QTimer* timerGraph = new QTimer(this);
-    connect(timerGraph, SIGNAL(timeout()), this, SLOT(updateGraph()));
-    timerGraph->start(INTERVALLO_UPDATE_GRAFICO * 1000);  // update del grafico ogni 10 secondi
 
     setupCalibrationTab();
 }
@@ -110,6 +113,7 @@ void MainWindow::slot_TemperatureSensor_StatusChanged()
       m_Ui->m_QStatusBar->showMessage(tr("Running"));
     }
     break;
+
     case TemperatureSensor::Enum_Status_Stop:
     {
       m_Ui->m_QStatusBar->showMessage(tr("Stop"));

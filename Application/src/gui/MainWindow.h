@@ -42,8 +42,10 @@ private:
     static const QString PORT_2;
 
     Ui::MainWindow *m_Ui;
-    std::ofstream* m_log;
+
     TemperatureSensor* m_TemperatureSensor;
+
+    QTimer m_QTimer_UpdateGraphics;
 };
 
 #endif // MAINWINDOW_H
