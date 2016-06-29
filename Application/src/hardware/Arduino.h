@@ -3,7 +3,7 @@
 
 #include <QString>
 
-class QextSerialPort;
+class QSerialPort;
 
 class Arduino
 {
@@ -19,7 +19,7 @@ public:
 
 private:
 
-    QextSerialPort *m_QExtSerialPort;
+    QSerialPort *m_QExtSerialPort;
 
     double m_A1_Voltage;
 

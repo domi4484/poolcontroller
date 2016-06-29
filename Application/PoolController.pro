@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui sql
+QT       += core gui sql widgets serialport
 
 TARGET = temperaturaPiscina
 TEMPLATE = app
@@ -15,21 +15,19 @@ UI_DIR      = build
 OBJECTS_DIR = build
 
 
-CONFIG += extserialport
-
 SOURCES +=\
     src/gui/MainWindow.cpp \
     src/hardware/AbstractTemperaturesensor.cpp \
     src/hardware/Arduino.cpp \
     src/hardware/CpuTemperature.cpp \
-    src/hardware/DialogAddCalibrationpoint.cpp \
+    src/hardware/DialogAddCalibrationPoint.cpp \
     src/hardware/TemperatureSensor.cpp \
     src/HelperClasses/Logger.cpp \
     src/main.cpp
 
 HEADERS  += \
     src/hardware/CpuTemperature.h \
-    src/hardware/DialogAddCalibrationpoint.h \
+    src/hardware/DialogAddCalibrationPoint.h \
     src/hardware/TemperatureSensor.h \
     src/hardware/Arduino.h \
     src/hardware/AbstractTemperaturesensor.h \
@@ -37,8 +35,8 @@ HEADERS  += \
     src/HelperClasses/Logger.h
 
 FORMS    += \
-    src/hardware/DialogAddCalibrationpoint.ui \
-    src/gui/MainWindow.ui
+    src/gui/MainWindow.ui \
+    src/hardware/DialogAddCalibrationPoint.ui
 
 DISTFILES += \
     scripts/caratteristica.py \

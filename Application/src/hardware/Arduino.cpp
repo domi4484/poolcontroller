@@ -5,7 +5,7 @@
 
 #include <QDebug>
 
-#include "qextserialport.h"
+#include <QSerialPort>
 
 //-----------------------------------------------------------------------------------------------------------------------------
 
@@ -26,8 +26,8 @@ Arduino::~Arduino()
 bool Arduino::open(const QString &port_name)
 {
   Logger::info(QString("Initializing Arduino device on port: %1").arg(port_name));
-  m_QExtSerialPort = new QextSerialPort(port_name);
-  m_QExtSerialPort->setBaudRate(BAUD9600);
+  m_QExtSerialPort = new QSerialPort(port_name);
+  m_QExtSerialPort->setBaudRate(QSerialPort::Baud9600);
   m_QExtSerialPort->open(QIODevice::ReadWrite | QIODevice::Unbuffered);
 
   return m_QExtSerialPort->isOpen();
@@ -59,8 +59,8 @@ double Arduino::get_A1_Voltage()
 
 bool Arduino::send(const QString &message)
 {
-    int i = m_QExtSerialPort->write(message.toAscii(),
-                          message.length());
+    int i = m_QExtSerialPort->write(message.toLatin1(),
+                                    message.length());
 
     if(i == -1)
     {

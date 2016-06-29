@@ -1,5 +1,9 @@
-#include <QtGui/QApplication>
+
+// Project includes ------------------------
 #include "gui/MainWindow.h"
+
+// Qt includes -----------------------------
+#include <QApplication>
 
 const QString EMULATE("--emulate");
 
